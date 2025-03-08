@@ -1,26 +1,21 @@
 public static class ConditionFactory
 {
-    public static (ITimeCondition condition, string sceneName) CreateCondition(ConditionConfig config)
+    public static ITimeCondition CreateCondition(ConditionConfig config)
     {
-        ITimeCondition condition = null;
         switch (config.conditionType)
         {
             case ConditionType.GreaterThan:
-                condition = new GreaterThanCondition(config.value1);
-                break;
+                return new GreaterThanCondition(config.value1);
             case ConditionType.LessThan:
-                condition = new LessThanCondition(config.value1);
-                break;
+                return new LessThanCondition(config.value1);
             case ConditionType.Between:
-                condition = new BetweenCondition(config.value1, config.value2);
-                break;
+                return new BetweenCondition(config.value1, config.value2);
             case ConditionType.DivisibleBy:
-                condition = new DivisibleByCondition(config.value1); // DivisibleBy uses tolerance internally.
-                break;
+                return new DivisibleByCondition(config.value1);
             case ConditionType.EqualTo:
-                condition = new EqualToCondition(config.value1);
-                break;
+                return new EqualToCondition(config.value1);
+            default:
+                return null;
         }
-        return (condition, config.conditionSceneName);
     }
 }

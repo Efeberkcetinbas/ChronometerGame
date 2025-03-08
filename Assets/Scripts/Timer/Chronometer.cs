@@ -6,51 +6,64 @@ public class Chronometer : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI timerText;
     [SerializeField] private LevelConditionManager conditionManager;
-    
-    // Speed multiplier for the timer (adjustable in the Inspector).
-    // Lower values make the timer run slower, giving the player more time to stop it.
-    [SerializeField] private float timerSpeed = 50f;
+    [SerializeField] private float timerSpeed = 50f; // Adjust this value to make the timer slower or faster.
     
     private float _currentTime;
-    private bool _isRunning = false;
+    private bool _isRunning = true; // Initially, the timer is running.
     
-    /// <summary>
-    /// Starts the chronometer from 0.
-    /// </summary>
-    public void StartTimer()
-    {
-        _currentTime = 0;
-        _isRunning = true;
-    }
-
-    /// <summary>
-    /// Stops the chronometer and validates the current condition.
-    /// </summary>
-    public void StopTimer()
-    {
-        _isRunning = false;
-        conditionManager.ValidateCurrentCondition(_currentTime);
-    }
+    // To detect a new touch without triggering multiple toggles per touch.
+    private bool _touchInProgress = false;
 
     private void Update()
     {
+        // Check for touch input.
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+            // When a new touch begins, toggle the timer state.
+            if (touch.phase == TouchPhase.Began && !_touchInProgress)
+            {
+                _touchInProgress = true;
+                ToggleTimer();
+            }
+        }
+        else
+        {
+            _touchInProgress = false;
+        }
+
+        // If the timer is running, update the timer.
         if (_isRunning)
         {
-            // Increase current time based on Time.deltaTime multiplied by timerSpeed.
             _currentTime += Time.deltaTime * timerSpeed;
-            
-            // When reaching 100, reset to 0 so the timer cycles.
             if (_currentTime >= 100f)
             {
                 _currentTime = 0f;
             }
-            
             UpdateDisplay();
         }
     }
     
     /// <summary>
-    /// Updates the timer display.
+    /// Toggles the timer: stops and validates the condition if running, resumes otherwise.
+    /// </summary>
+    private void ToggleTimer()
+    {
+        if (_isRunning)
+        {
+            // Stop the timer and validate the current condition.
+            _isRunning = false;
+            conditionManager.ValidateCurrentCondition(_currentTime);
+        }
+        else
+        {
+            // Resume the timer without resetting the current time.
+            _isRunning = true;
+        }
+    }
+    
+    /// <summary>
+    /// Updates the timer UI text.
     /// </summary>
     private void UpdateDisplay()
     {

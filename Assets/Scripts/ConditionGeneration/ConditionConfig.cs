@@ -11,6 +11,5 @@ public class ConditionConfig : ScriptableObject
     public float value1;
     public float value2; // Only used for Between type.
     
-    // A string representing the unique scene or animation identifier for this condition.
-    public string conditionSceneName;
+    
 }
